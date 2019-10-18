@@ -1,0 +1,78 @@
+service: CryptoScreenerBack # NOTE: update this with your service name
+
+# Create an optimized package for our functions 
+package:
+  individually: true
+
+plugins:
+  - serverless-bundle # Package our functions with Webpack
+  - serverless-offline
+
+# Custom Variables
+custom: ${file(./serverless_vars.yml)}
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${opt:stage, 'local'}
+  region: us-east-1
+  environment:
+    JWT_SECRET: ${self:custom.secrets.JWT_SECRET}
+    MYSQL_HOST: ${self:custom.mysqlHost.${self:provider.stage}}
+    MYSQL_USER: ${self:custom.mysqlUser.${self:provider.stage}}
+    MYSQL_PASSWORD: ${self:custom.mysqlPassword.${self:provider.stage}}
+    MYSQL_DATABASE: ${self:custom.mysqlDatabase.${self:provider.stage}}
+    MYSQL_PORT: ${self:custom.mysqlPort.${self:provider.stage}}
+    BINANCE_KEY: ${self:custom.binanceApiKey.${self:provider.stage}}
+    BINANCE_SECRET: ${self:custom.binanceApiSecret.${self:provider.stage}}
+
+functions:
+  verify-token:
+    handler: auth/VerifyToken.auth
+    environment:
+      JWT_SECRET: ${self:custom.secrets.JWT_SECRET}
+    
+  register:
+    handler: auth/AuthHandler.register
+    events:
+      - http:
+          path: crypto/register
+          method: post
+  
+  admin:
+    handler: auth/AuthHandler.admin
+    events:
+      - http:
+          path: crypto/admin
+          method: post
+          cors: true
+          authorizer: verify-token
+
+  login:
+    handler: auth/AuthHandler.login
+    events:
+      - http:
+          path: crypto/login
+          method: post
+          cors: true
+  
+  getBalance:
+    handler: data/account.getBalance
+    events:
+      - http:
+          path: crypto/getBalance
+          method: post
+          cors: true
+          authorizer: verify-token
+
+  getMarket:
+    handler: data/market.getMarket
+    events:
+      - http:
+          path: crypto/getMarket
+          method: get
+          cors: true
+          authorizer: verify-token
+    environment:
+      REDIS_PORT: ${self:custom.redisPort.${self:provider.stage}}
+      REDIS_HOST: ${self:custom.redisHost.${self:provider.stage}}

@@ -1,0 +1,53 @@
+secrets: ${file(settings.json)}
+
+stages:
+  - local
+  - dev
+  # - staging
+  # - prod
+bundle:
+  sourcemaps: false # Enable source maps
+  caching: false    # Enable Webpack caching
+  stats: false      # Don't print out any Webpack output
+  linting: false    # Enable linting as a part of the build process
+mysqlHost:
+  local: 'localhost'
+  dev: ${ssm:/cryptoscreener/dev/mysql-host} #get from ssm
+  # staging: ${ssm:/myapp/staging/mysql-host} #get from ssm
+  # prod: ${ssm:/myapp/prod/mysql-host} #get from ssm
+mysqlUser:
+  local: 'root'
+  dev: ${ssm:/cryptoscreener/dev/mysql-user} #get from ssm
+  # staging: root
+  # prod: root
+mysqlPassword:
+  local: 'password'
+  dev: ${ssm:/fraccionamientos/dev/mysql-password~true} #get from ssm (secure)
+  # staging: ${ssm:/myapp/staging/mysql-password~true} #get from ssm (secure)
+  # prod: ${ssm:/myapp/prod/mysql-password~true} #get from ssm (secure)
+mysqlDatabase:
+  local: 'database'
+  dev: ${ssm:/cryptoscreener/dev/mysql-database} #get from ssm
+  # staging: database
+  # prod: database
+mysqlPort:
+  local: '3306'
+  dev: ${ssm:/cryptoscreener/dev/mysql-port} #get from ssm
+  # staging: '3306'
+  # prod: '3306'
+binanceApiKey:
+  local: ''
+  dev: ''
+  # staging: ''
+  # prod: ''
+binanceApiSecret:
+  local: ''
+  dev: ''
+  # staging: ''
+  # prod: ''
+redisPort:
+  local: 6379
+  dev: 6379
+redisHost:
+  local: 'localhost'
+  dev: 'localhost'

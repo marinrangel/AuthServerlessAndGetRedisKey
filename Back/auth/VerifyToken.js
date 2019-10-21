@@ -24,11 +24,11 @@ export const auth = async (event, context, callback) => {
   const token = event.authorizationToken.replace("Bearer ", "");
   
   if (!token) 
-    return callback(null, "Unauthorized");
+    return callback("Unauthorized", null);
   
   jwt.verify(token, conf.jwtSecret, (err, decoded) => {
     if (err) 
-      return callback(null, "Unauthorized");
+      return callback("Unauthorized", null);
 
     return callback(null, generatePolicy(decoded.id, "Allow", event.methodArn));
   });
